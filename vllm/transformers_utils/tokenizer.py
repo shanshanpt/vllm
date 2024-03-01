@@ -196,6 +196,8 @@ def detokenize_incrementally(
     if prev_tokens is None:
         new_tokens = tokenizer.convert_ids_to_tokens(
             all_input_ids, skip_special_tokens=skip_special_tokens)
+        #if new_tokens[0] is None:
+        #    print("==================> new_tokens = ", new_tokens, ", all_input_ids=", all_input_ids) 
         output_tokens = new_tokens
         # 5 is an arbitrary value that should work for all
         # tokenizers (bigger = more conservative).
@@ -210,7 +212,18 @@ def detokenize_incrementally(
         # Put new_token_id in a list so skip_special_tokens is respected
         new_tokens = tokenizer.convert_ids_to_tokens(
             [new_token_id], skip_special_tokens=skip_special_tokens)
+        #if new_tokens[0] is None:
+        #    print("==================> new_tokens = ", new_tokens, ", new_token_id=", new_token_id)
+
+        #
+        # TODO: FIXME hack here for testing
+        #
+        for i in range(len(new_tokens)):
+            if new_tokens[i] is None:
+                new_tokens[0] = 'a'
+
         output_tokens = prev_tokens + new_tokens
+
 
     # The prefix text is necessary only to defeat cleanup algorithms in
     # the decode which decide to add a space or not depending on the

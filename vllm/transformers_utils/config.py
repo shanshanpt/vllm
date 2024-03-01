@@ -9,6 +9,7 @@ _CONFIG_REGISTRY = {
     "mpt": MPTConfig,
     "RefinedWeb": RWConfig,  # For tiiuae/falcon-40b(-instruct)
     "RefinedWebModel": RWConfig,  # For tiiuae/falcon-7b(-instruct)
+    "qwen2_moe": Qwen2MoEConfig,
 }
 
 
@@ -17,11 +18,18 @@ def get_config(model: str,
                revision: Optional[str] = None,
                code_revision: Optional[str] = None) -> PretrainedConfig:
     try:
+        #
+        # TODO: FIXME hack here
+        #
+        """
         config = AutoConfig.from_pretrained(
             model,
             trust_remote_code=trust_remote_code,
             revision=revision,
             code_revision=code_revision)
+        """
+        config = Qwen2MoEConfig.from_pretrained(model)
+
     except ValueError as e:
         if (not trust_remote_code and
                 "requires you to execute the configuration file" in str(e)):

@@ -733,6 +733,7 @@ class LLMEngine:
             self, output: SamplerOutput,
             scheduler_outputs: SchedulerOutputs) -> List[RequestOutput]:
         now = time.time()
+        #print("=========================>>>>>> output = ", output)
         # Update the scheduled sequence groups with the model outputs.
         scheduled_seq_groups = scheduler_outputs.scheduled_seq_groups
         for seq_group, outputs in zip(scheduled_seq_groups, output):
@@ -911,6 +912,7 @@ class LLMEngine:
 
     def _decode_sequence(self, seq: Sequence, prms: SamplingParams) -> None:
         """Decodes the new token for a sequence."""
+        #print("=====================>>>> seq.tokens = ", seq.tokens)
         (new_tokens, new_output_text, prefix_offset,
          read_offset) = detokenize_incrementally(
              self.get_tokenizer_for_seq(seq),
@@ -931,7 +933,7 @@ class LLMEngine:
 
     def _check_stop(self, seq: Sequence,
                     sampling_params: SamplingParams) -> None:
-        """Stop the finished sequences."""
+        """
         for stop_str in sampling_params.stop:
             if seq.output_text.endswith(stop_str):
                 self._finalize_sequence(seq, sampling_params, stop_str)
@@ -948,17 +950,20 @@ class LLMEngine:
         if seq.get_len() > self.scheduler_config.max_model_len:
             seq.status = SequenceStatus.FINISHED_LENGTH_CAPPED
             return
+        """
 
         # Check if the sequence has reached max_tokens.
         if seq.get_output_len() == sampling_params.max_tokens:
             seq.status = SequenceStatus.FINISHED_LENGTH_CAPPED
+            #print("==================> finishged: ", seq.get_output_len(), flush=True)
             return
-
+        """
         # Check if the sequence has generated the EOS token.
         if ((not sampling_params.ignore_eos) and seq.get_last_token_id()
                 == self.get_tokenizer_for_seq(seq).eos_token_id):
             seq.status = SequenceStatus.FINISHED_STOPPED
             return
+        """
 
     def _finalize_sequence(self, seq: Sequence,
                            sampling_params: SamplingParams,
